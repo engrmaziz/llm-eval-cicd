@@ -20,11 +20,11 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install deepeval pytest google-generativeai
+        pip install deepeval pytest google-generativeai pytest-json-report
 
     - name: Run Evaluations
       env:
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} # Set this free key in GitHub Secrets
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} # Pulled securely from GitHub Secrets
       run: |
         pytest tests/test_llm.py --json-report --json-report-file=report.json
 
