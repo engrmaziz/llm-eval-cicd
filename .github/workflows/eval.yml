@@ -6,12 +6,17 @@ on:
   pull_request:
     branches: [ main ]
 
+permissions:
+  contents: write # Allows the workflow to save and push dashboard history logs back to git
+
 jobs:
   evaluate:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Fetches full git history for data tracing
 
     - name: Set up Python
       uses: actions/setup-python@v5
@@ -20,15 +25,30 @@ jobs:
 
     - name: Install dependencies
       run: |
-pip install deepeval pytest google-genai pytest-json-report
+        pip install deepeval pytest google-genai pytest-json-report
+
     - name: Run Evaluations
       env:
-        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }} # Pulled securely from GitHub Secrets
+        GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
       run: |
         pytest tests/test_llm.py --json-report --json-report-file=report.json
+
+    - name: Calculate Telemetry Analytics (p50/p95/Cost)
+      if: always() # Run analytics even if a test case failed and tripped an assertion
+      run: |
+        python scripts/process_metrics.py
 
     - name: Upload Metrics Artifact
       uses: actions/upload-artifact@v4
       with:
         name: eval-report
         path: report.json
+
+    - name: Update Historical Log Database
+      if: github.ref == 'refs/heads/main' && always()
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git add history.json || true
+        git commit -m "chore: telemetry update for commit ${GITHUB_SHA::7} [skip ci]" || true
+        git push origin main || true
