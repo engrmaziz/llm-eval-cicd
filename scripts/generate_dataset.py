@@ -1,8 +1,8 @@
-"""Generate a synthetic golden dataset for DeepEval.
+"""Generate a synthetic golden dataset for DeepEval using Groq.
 
-This script uses the google-generativeai SDK with gemini-1.5-flash to
-create 100 customer-support question-answer-context trios and writes the
-final array to tests/dataset.json.
+This script uses the groq SDK with llama-3.3-70b-versatile and native
+JSON Mode to reliably create 100 customer-support question-answer-context
+trios and writes the final array to tests/dataset.json.
 """
 
 from __future__ import annotations
@@ -13,13 +13,13 @@ import time
 from pathlib import Path
 from typing import Any, Dict, List
 
-import google.generativeai as genai
+from groq import Groq
 
 
 TOTAL_ITEMS = 100
 BATCH_SIZE = 5
-MODEL_NAME = "gemini-1.5-flash"
-SLEEP_SECONDS = 5
+MODEL_NAME = "llama-3.3-70b-versatile"
+SLEEP_SECONDS = 3  # Stable delay for Groq request rate compliance
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_PATH = REPO_ROOT / "tests" / "dataset.json"
@@ -64,11 +64,11 @@ Customer Support Knowledge Base
 """.strip()
 
 
-def configure_model() -> None:
-    api_key = os.getenv("GOOGLE_API_KEY") or os.getenv("GEMINI_API_KEY")
+def get_client() -> Groq:
+    api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
-        raise RuntimeError("Set GOOGLE_API_KEY or GEMINI_API_KEY before running this script.")
-    genai.configure(api_key=api_key)
+        raise RuntimeError("Set GROQ_API_KEY before running this script.")
+    return Groq(api_key=api_key)
 
 
 def build_prompt(batch_size: int, existing_inputs: List[str]) -> str:
@@ -76,23 +76,27 @@ def build_prompt(batch_size: int, existing_inputs: List[str]) -> str:
     return f"""
 You are generating a synthetic golden dataset for customer support evaluation.
 
-Use only the knowledge base facts below. Do not invent policies beyond the facts.
-Return valid JSON only, with no markdown fences and no commentary.
+Use only the knowledge base facts below. Do not invent policies or rules beyond the facts.
+You must return a valid JSON object containing a "dataset" key which holds an array of exactly {batch_size} items.
 
-Target schema for each object:
+Target JSON Object structure:
 {{
-  "input": "string",
-  "expected_output": "string",
-  "context": ["string", "string"]
+  "dataset": [
+    {{
+      "input": "string",
+      "expected_output": "string",
+      "context": ["string", "string"]
+    }}
+  ]
 }}
 
 Requirements:
-- Produce exactly {batch_size} unique items.
+- Produce exactly {batch_size} unique items inside the "dataset" array wrapper.
 - The domain must be customer support for e-commerce policies and tech hardware.
-- Make the questions varied: refunds, shipping, warranties, payments, claims, cancellations, and support hours.
-- Each context array must contain 1 to 3 short factual strings from the knowledge base.
-- Keep expected_output concise, grounded, and directly answer the question.
-- Avoid repeating any of these recently generated inputs:
+- Make the questions highly varied: refunds, shipping, warranties, payments, claims, cancellations, and support hours.
+- Each context array must contain 1 to 3 short factual strings exactly matching the knowledge base.
+- Keep expected_output concise, grounded, and directly answering the question.
+- Avoid repeating or duplicating any of these recently generated inputs:
 {existing_examples}
 
 Knowledge base:
@@ -100,70 +104,66 @@ Knowledge base:
 """.strip()
 
 
-def extract_json_array(text: str) -> List[Dict[str, Any]]:
-    start = text.find("[")
-    end = text.rfind("]")
-    if start == -1 or end == -1 or end <= start:
-        raise ValueError("Model response did not contain a JSON array.")
-
-    payload = text[start : end + 1]
-    data = json.loads(payload)
-    if not isinstance(data, list):
-        raise ValueError("Model response JSON must be an array.")
-    return data
-
-
 def validate_item(item: Dict[str, Any]) -> Dict[str, Any]:
     if not isinstance(item, dict):
         raise ValueError("Each dataset item must be an object.")
 
     required_keys = {"input", "expected_output", "context"}
-    if set(item) != required_keys:
-        raise ValueError(f"Dataset item must contain only {sorted(required_keys)}.")
+    if not required_keys.issubset(set(item)):
+        raise ValueError(f"Dataset item is missing required keys: {required_keys}")
 
-    input_text = item["input"]
-    expected_output = item["expected_output"]
-    context = item["context"]
+    input_text = str(item.get("input", "")).strip()
+    expected_output = str(item.get("expected_output", "")).strip()
+    context = item.get("context", [])
 
-    if not isinstance(input_text, str) or not input_text.strip():
-        raise ValueError("'input' must be a non-empty string.")
-    if not isinstance(expected_output, str) or not expected_output.strip():
-        raise ValueError("'expected_output' must be a non-empty string.")
-    if not isinstance(context, list) or not context:
-        raise ValueError("'context' must be a non-empty list of strings.")
-    if not all(isinstance(entry, str) and entry.strip() for entry in context):
-        raise ValueError("Every context entry must be a non-empty string.")
+    if not isinstance(context, list):
+        context = [context]
+
+    clean_context = [str(entry).strip() for entry in context if str(entry).strip()]
+
+    if not input_text or not expected_output or not clean_context:
+        raise ValueError("Dataset item fields cannot be empty.")
 
     return {
-        "input": input_text.strip(),
-        "expected_output": expected_output.strip(),
-        "context": [entry.strip() for entry in context],
+        "input": input_text,
+        "expected_output": expected_output,
+        "context": clean_context,
     }
 
 
-def generate_batch(model: Any, batch_size: int, existing_inputs: List[str]) -> List[Dict[str, Any]]:
+def generate_batch(client: Groq, batch_size: int, existing_inputs: List[str]) -> List[Dict[str, Any]]:
     prompt = build_prompt(batch_size, existing_inputs)
-    response = model.generate_content(prompt)
-    response_text = getattr(response, "text", None) or str(response)
-    raw_items = extract_json_array(response_text)
-    return [validate_item(item) for item in raw_items]
+    
+    # Leveraging Groq's native JSON mode to guarantee syntax validity
+    response = client.chat.completions.create(
+        model=MODEL_NAME,
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.2,
+        response_format={"type": "json_object"}
+    )
+    
+    response_text = response.choices[0].message.content
+    data = json.loads(response_text)
+    
+    if "dataset" not in data or not isinstance(data["dataset"], list):
+        raise ValueError("Model response JSON did not contain a 'dataset' key array.")
+        
+    return [validate_item(item) for item in data["dataset"]]
 
 
 def generate_dataset() -> List[Dict[str, Any]]:
-    configure_model()
-    model = genai.GenerativeModel(MODEL_NAME)
-
+    client = get_client()
     items: List[Dict[str, Any]] = []
     seen_inputs = set()
 
-    print(f"🚀 Starting synthetic dataset generation for {TOTAL_ITEMS} items...")
+    print(f"🚀 Starting Groq dataset generation for {TOTAL_ITEMS} items...")
 
     while len(items) < TOTAL_ITEMS:
         remaining = TOTAL_ITEMS - len(items)
         batch_size = min(BATCH_SIZE, remaining)
 
         try:
-            batch_items = generate_batch(model, batch_size, [item["input"] for item in items])
+            batch_items = generate_batch(client, batch_size, [item["input"] for item in items])
 
             for item in batch_items:
                 if item["input"] in seen_inputs:
@@ -175,9 +175,9 @@ def generate_dataset() -> List[Dict[str, Any]]:
 
             print(f"📦 Progress: {len(items)}/{TOTAL_ITEMS} items successfully compiled.")
 
-        except (ValueError, json.JSONDecodeError) as e:
-            print(f"⚠️ Warning: Batch generation failed due to formatting issues ({e}). Retrying...")
-            time.sleep(SLEEP_SECONDS)
+        except Exception as e:
+            print(f"⚠️ Warning: Batch generation encountered an error ({e}). Retrying in 5s...")
+            time.sleep(5)
             continue
 
         if len(items) < TOTAL_ITEMS:
@@ -187,6 +187,7 @@ def generate_dataset() -> List[Dict[str, Any]]:
 
 
 def save_dataset(dataset: List[Dict[str, Any]]) -> None:
+    OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUTPUT_PATH.write_text(json.dumps(dataset, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 

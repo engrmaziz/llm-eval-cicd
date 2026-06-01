@@ -1,0 +1,11 @@
+[
+  {
+    "commit_sha": "local-r",
+    "timestamp": "2026-06-01 11:44:55 UTC",
+    "total_cases": 100,
+    "pass_rate_percent": 9.0,
+    "p50_latency_sec": 47.255,
+    "p95_latency_sec": 48.957,
+    "estimated_cost_usd": 0.0
+  }
+]

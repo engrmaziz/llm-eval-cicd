@@ -1,7 +1,731 @@
 [
   {
-    "input": "What is your return policy for items opened after 30 days?",
-    "expected_output": "We do not accept returns for opened items after 30 days. You may qualify for store credit.",
-    "context": ["Section 4.2: Opened items are eligible for refund within 30 days. Beyond 30 days, only store credit is issued."]
+    "input": "How long does it take to get a refund after returning an item?",
+    "expected_output": "5 to 10 business days",
+    "context": [
+      "Refunds are issued to the original payment method within 5 to 10 business days after approval"
+    ]
+  },
+  {
+    "input": "Can I return an opened item after 30 days?",
+    "expected_output": "No, only eligible for store credit",
+    "context": [
+      "After 30 days, opened items are not eligible for a refund, but some orders may qualify for store credit"
+    ]
+  },
+  {
+    "input": "What is the shipping time for standard shipping?",
+    "expected_output": "3 to 5 business days",
+    "context": [
+      "Standard shipping takes 3 to 5 business days"
+    ]
+  },
+  {
+    "input": "How long is the warranty for electronics?",
+    "expected_output": "1 year",
+    "context": [
+      "Electronics include a 1-year limited warranty"
+    ]
+  },
+  {
+    "input": "When can I cancel my order?",
+    "expected_output": "Before the order is packed for shipping",
+    "context": [
+      "Cancellations are only possible before the order is packed for shipping"
+    ]
+  },
+  {
+    "input": "Can I get a refund for an unopened item after 45 days?",
+    "expected_output": "Yes, within 60 days of delivery",
+    "context": [
+      "Unopened items may be returned within 60 days of delivery.",
+      "Refunds are issued to the original payment method within 5 to 10 business days after approval."
+    ]
+  },
+  {
+    "input": "How do I track my expedited shipment?",
+    "expected_output": "Tracking numbers are emailed when the package is scanned by the carrier",
+    "context": [
+      "Tracking numbers are emailed when the package is scanned by the carrier.",
+      "Expedited shipping takes 1 to 2 business days."
+    ]
+  },
+  {
+    "input": "What is covered under the electronics warranty?",
+    "expected_output": "1-year limited warranty, excluding physical damage, liquid damage, and unauthorized repairs",
+    "context": [
+      "Electronics include a 1-year limited warranty.",
+      "Physical damage, liquid damage, and unauthorized repairs are not covered."
+    ]
+  },
+  {
+    "input": "Can I use a promo code with a gift card for a subscription purchase?",
+    "expected_output": "No, gift cards cannot be combined with subscription purchases",
+    "context": [
+      "Only one promo code can be used per order.",
+      "Gift cards cannot be combined with subscription purchases."
+    ]
+  },
+  {
+    "input": "When should I submit a claim for a damaged delivery?",
+    "expected_output": "Within 48 hours of delivery",
+    "context": [
+      "Damaged delivery claims must be submitted within 48 hours of delivery."
+    ]
+  },
+  {
+    "input": "Can I return an item after 60 days if it's still unopened?",
+    "expected_output": "No",
+    "context": [
+      "Unopened items may be returned within 60 days of delivery."
+    ]
+  },
+  {
+    "input": "How long does expedited shipping take?",
+    "expected_output": "1 to 2 business days",
+    "context": [
+      "Expedited shipping takes 1 to 2 business days."
+    ]
+  },
+  {
+    "input": "What is covered under the warranty for accessories?",
+    "expected_output": "90-day limited warranty",
+    "context": [
+      "Accessories include a 90-day limited warranty."
+    ]
+  },
+  {
+    "input": "Can I use multiple promo codes for one purchase?",
+    "expected_output": "No",
+    "context": [
+      "Only one promo code can be used per order."
+    ]
+  },
+  {
+    "input": "When should I expect a response from email support?",
+    "expected_output": "Within 1 to 2 business days",
+    "context": [
+      "Email support replies within 1 to 2 business days."
+    ]
+  },
+  {
+    "input": "Can I get a refund for a defective item after 60 days?",
+    "expected_output": "No, refunds for defective items are subject to the standard return window.",
+    "context": [
+      "Opened items may be returned within 30 days of delivery.",
+      "Unopened items may be returned within 60 days of delivery."
+    ]
+  },
+  {
+    "input": "How do I get a VAT invoice for my business purchase?",
+    "expected_output": "VAT invoices are available for business customers in supported regions.",
+    "context": [
+      "VAT invoices are available for business customers in supported regions."
+    ]
+  },
+  {
+    "input": "What happens if my payment fails?",
+    "expected_output": "Failed payments are retried up to three times over 48 hours.",
+    "context": [
+      "Failed payments are retried up to three times over 48 hours."
+    ]
+  },
+  {
+    "input": "Can I use a gift card to buy a subscription?",
+    "expected_output": "No, gift cards cannot be combined with subscription purchases.",
+    "context": [
+      "Gift cards cannot be combined with subscription purchases."
+    ]
+  },
+  {
+    "input": "When can I expect a response from live chat support?",
+    "expected_output": "Live chat is available daily from 8:00 AM to 8:00 PM UTC.",
+    "context": [
+      "Live chat is available daily from 8:00 AM to 8:00 PM UTC."
+    ]
+  },
+  {
+    "input": "Can I return an item after 45 days if it's still sealed?",
+    "expected_output": "Yes, unopened items can be returned within 60 days.",
+    "context": [
+      "Unopened items may be returned within 60 days of delivery."
+    ]
+  },
+  {
+    "input": "How do I get a replacement for a defective item under warranty?",
+    "expected_output": "Submit a warranty claim with proof of purchase.",
+    "context": [
+      "Electronics include a 1-year limited warranty.",
+      "Warranty claims require proof of purchase."
+    ]
+  },
+  {
+    "input": "What if my payment fails, will I be charged again?",
+    "expected_output": "Failed payments are retried up to three times over 48 hours.",
+    "context": [
+      "Failed payments are retried up to three times over 48 hours."
+    ]
+  },
+  {
+    "input": "Can I use a promo code and a gift card for the same purchase?",
+    "expected_output": "No, only one promo code can be used per order and gift cards cannot be combined with certain purchases.",
+    "context": [
+      "Only one promo code can be used per order.",
+      "Gift cards cannot be combined with subscription purchases."
+    ]
+  },
+  {
+    "input": "When can I expect help from live chat support?",
+    "expected_output": "Live chat is available daily from 8:00 AM to 8:00 PM UTC.",
+    "context": [
+      "Live chat is available daily from 8:00 AM to 8:00 PM UTC."
+    ]
+  },
+  {
+    "input": "Can I get a refund for an item that was damaged during shipping?",
+    "expected_output": "Yes, refunds are available for damaged items, return shipping is free.",
+    "context": [
+      "Return shipping is free only for defective items or warehouse fulfillment errors.",
+      "Damaged delivery claims must be submitted within 48 hours of delivery."
+    ]
+  },
+  {
+    "input": "How do I cancel my order before it ships?",
+    "expected_output": "Cancellations are only possible before the order is packed for shipping.",
+    "context": [
+      "Cancellations are only possible before the order is packed for shipping."
+    ]
+  },
+  {
+    "input": "What is the warranty period for electronics?",
+    "expected_output": "Electronics include a 1-year limited warranty.",
+    "context": [
+      "Electronics include a 1-year limited warranty.",
+      "Warranty claims require proof of purchase."
+    ]
+  },
+  {
+    "input": "Can I use multiple gift cards for one purchase?",
+    "expected_output": "No, only one promo code can be used per order, and gift cards cannot be combined with subscription purchases.",
+    "context": [
+      "Only one promo code can be used per order.",
+      "Gift cards cannot be combined with subscription purchases."
+    ]
+  },
+  {
+    "input": "When can I expect a response from email support during weekends?",
+    "expected_output": "Email support replies within 1 to 2 business days.",
+    "context": [
+      "Email support replies within 1 to 2 business days.",
+      "Live chat is available daily from 8:00 AM to 8:00 PM UTC."
+    ]
+  },
+  {
+    "input": "How long does standard shipping take?",
+    "expected_output": "3 to 5 business days",
+    "context": [
+      "Standard shipping takes 3 to 5 business days"
+    ]
+  },
+  {
+    "input": "What is the warranty period for accessories?",
+    "expected_output": "90 days",
+    "context": [
+      "Accessories include a 90-day limited warranty"
+    ]
+  },
+  {
+    "input": "Can I cancel my order after it has been packed for shipping?",
+    "expected_output": "No",
+    "context": [
+      "Cancellations are only possible before the order is packed for shipping"
+    ]
+  },
+  {
+    "input": "When is live chat support available?",
+    "expected_output": "Daily from 8:00 AM to 8:00 PM UTC",
+    "context": [
+      "Live chat is available daily from 8:00 AM to 8:00 PM UTC"
+    ]
+  },
+  {
+    "input": "Can I return an unopened item after 50 days?",
+    "expected_output": "Yes, within 60 days",
+    "context": [
+      "Unopened items may be returned within 60 days of delivery"
+    ]
+  },
+  {
+    "input": "How long does it take to get a replacement under warranty?",
+    "expected_output": "7 to 14 business days",
+    "context": [
+      "Repair turnaround is usually 7 to 14 business days after the item is received"
+    ]
+  },
+  {
+    "input": "What if I want to cancel my order, is it possible after it's been packed?",
+    "expected_output": "No, only before packing",
+    "context": [
+      "Cancellations are only possible before the order is packed for shipping"
+    ]
+  },
+  {
+    "input": "Do I need to pay for shipping if I'm returning a defective item?",
+    "expected_output": "No, return shipping is free",
+    "context": [
+      "Return shipping is free only for defective items or warehouse fulfillment errors"
+    ]
+  },
+  {
+    "input": "Can I use a promo code with a gift card for the same purchase?",
+    "expected_output": "No, only one promo code per order",
+    "context": [
+      "Only one promo code can be used per order"
+    ]
+  },
+  {
+    "input": "What is the time frame to submit a claim for a damaged delivery?",
+    "expected_output": "within 48 hours of delivery",
+    "context": [
+      "Damaged delivery claims must be submitted within 48 hours of delivery"
+    ]
+  },
+  {
+    "input": "Can I get a refund if I return an unopened item after 45 days?",
+    "expected_output": "Yes, within 60 days",
+    "context": [
+      "Unopened items may be returned within 60 days of delivery"
+    ]
+  },
+  {
+    "input": "How long does it take to get a refund after it's approved?",
+    "expected_output": "5 to 10 business days",
+    "context": [
+      "Refunds are issued to the original payment method within 5 to 10 business days after approval"
+    ]
+  },
+  {
+    "input": "Is it possible to use more than one promo code for the same purchase?",
+    "expected_output": "No, only one promo code can be used per order",
+    "context": [
+      "Only one promo code can be used per order"
+    ]
+  },
+  {
+    "input": "What is the warranty period for tech accessories?",
+    "expected_output": "90 days",
+    "context": [
+      "Accessories include a 90-day limited warranty"
+    ]
+  },
+  {
+    "input": "Can I return an item that was damaged during shipping after 60 days?",
+    "expected_output": "No, you must submit a claim within 48 hours of delivery.",
+    "context": [
+      "Damaged delivery claims must be submitted within 48 hours of delivery."
+    ]
+  },
+  {
+    "input": "How long does it take to repair an item under warranty?",
+    "expected_output": "7 to 14 business days",
+    "context": [
+      "Repair turnaround is usually 7 to 14 business days after the item is received."
+    ]
+  },
+  {
+    "input": "Can I cancel my order after it has been shipped?",
+    "expected_output": "No, cancellations are only possible before the order is packed for shipping.",
+    "context": [
+      "Cancellations are only possible before the order is packed for shipping."
+    ]
+  },
+  {
+    "input": "Can I get a refund for an opened item after 20 days?",
+    "expected_output": "Yes, within 30 days of delivery.",
+    "context": [
+      "Opened items may be returned within 30 days of delivery."
+    ]
+  },
+  {
+    "input": "Can I use a gift card for a subscription purchase?",
+    "expected_output": "No, gift cards cannot be combined with subscription purchases.",
+    "context": [
+      "Gift cards cannot be combined with subscription purchases."
+    ]
+  },
+  {
+    "input": "How do I track my order?",
+    "expected_output": "Tracking numbers are emailed when the package is scanned by the carrier.",
+    "context": [
+      "Tracking numbers are emailed when the package is scanned by the carrier."
+    ]
+  },
+  {
+    "input": "Can I use a promo code and a gift card together for the same purchase?",
+    "expected_output": "No, only one promo code can be used per order and gift cards cannot be combined with certain purchases.",
+    "context": [
+      "Only one promo code can be used per order",
+      "Gift cards cannot be combined with subscription purchases"
+    ]
+  },
+  {
+    "input": "How long does it take to repair an item that is still under warranty?",
+    "expected_output": "Repair turnaround is usually 7 to 14 business days after the item is received.",
+    "context": [
+      "Repair turnaround is usually 7 to 14 business days after the item is received."
+    ]
+  },
+  {
+    "input": "How do I submit a claim for a missing item in my order?",
+    "expected_output": "Submit a claim with your order number and a photo of the package label.",
+    "context": [
+      "Missing item claims must include the order number and a photo of the package label."
+    ]
+  },
+  {
+    "input": "Can I use a promo code for a subscription purchase?",
+    "expected_output": "Yes, but only one promo code can be used per order.",
+    "context": [
+      "Only one promo code can be used per order.",
+      "Gift cards cannot be combined with subscription purchases."
+    ]
+  },
+  {
+    "input": "Can I get a refund if I return a defective item after 45 days?",
+    "expected_output": "Yes, within 60 days",
+    "context": [
+      "Unopened items may be returned within 60 days of delivery.",
+      "Return shipping is free only for defective items or warehouse fulfillment errors."
+    ]
+  },
+  {
+    "input": "What are the support hours for live chat?",
+    "expected_output": "8:00 AM to 8:00 PM UTC daily",
+    "context": [
+      "Live chat is available daily from 8:00 AM to 8:00 PM UTC."
+    ]
+  },
+  {
+    "input": "What is the time frame for returning an unopened item?",
+    "expected_output": "Within 60 days of delivery",
+    "context": [
+      "Unopened items may be returned within 60 days of delivery"
+    ]
+  },
+  {
+    "input": "Can I get a refund for a defective item after 30 days?",
+    "expected_output": "Yes, if returned within 60 days",
+    "context": [
+      "Unopened items may be returned within 60 days of delivery",
+      "Return shipping is free only for defective items or warehouse fulfillment errors"
+    ]
+  },
+  {
+    "input": "How do I know when my order has shipped?",
+    "expected_output": "You will receive a tracking number via email",
+    "context": [
+      "Tracking numbers are emailed when the package is scanned by the carrier"
+    ]
+  },
+  {
+    "input": "What is covered under the warranty for electronics?",
+    "expected_output": "1-year limited warranty",
+    "context": [
+      "Electronics include a 1-year limited warranty",
+      "Warranty claims require proof of purchase"
+    ]
+  },
+  {
+    "input": "What is the time frame for returning an opened item?",
+    "expected_output": "30 days",
+    "context": [
+      "Opened items may be returned within 30 days of delivery."
+    ]
+  },
+  {
+    "input": "Can I use a gift card to buy a tech accessory?",
+    "expected_output": "Yes",
+    "context": [
+      "Gift cards cannot be combined with subscription purchases."
+    ]
+  },
+  {
+    "input": "What is required to make a warranty claim?",
+    "expected_output": "Proof of purchase",
+    "context": [
+      "Warranty claims require proof of purchase."
+    ]
+  },
+  {
+    "input": "Can I return an unopened item after 45 days?",
+    "expected_output": "Yes, within 60 days of delivery.",
+    "context": [
+      "Unopened items may be returned within 60 days of delivery."
+    ]
+  },
+  {
+    "input": "What shipping method is not available for PO boxes?",
+    "expected_output": "Expedited shipping",
+    "context": [
+      "PO boxes cannot receive expedited shipments."
+    ]
+  },
+  {
+    "input": "How long does it take for a refund to be issued after approval?",
+    "expected_output": "5 to 10 business days",
+    "context": [
+      "Refunds are issued to the original payment method within 5 to 10 business days after approval."
+    ]
+  },
+  {
+    "input": "Can I use more than one promo code for the same purchase?",
+    "expected_output": "No",
+    "context": [
+      "Only one promo code can be used per order."
+    ]
+  },
+  {
+    "input": "What is required to submit a warranty claim for a defective item?",
+    "expected_output": "Proof of purchase",
+    "context": [
+      "Warranty claims require proof of purchase."
+    ]
+  },
+  {
+    "input": "Can I return an opened item after 30 days for a refund?",
+    "expected_output": "No, opened items are not eligible for a refund after 30 days.",
+    "context": [
+      "Opened items may be returned within 30 days of delivery."
+    ]
+  },
+  {
+    "input": "What shipping method should I use if I want to receive my order quickly and I have a PO box?",
+    "expected_output": "Use standard shipping, as expedited shipping is not available for PO boxes.",
+    "context": [
+      "PO boxes cannot receive expedited shipments.",
+      "Standard shipping takes 3 to 5 business days."
+    ]
+  },
+  {
+    "input": "How long does it take to get a refund after I return a defective item?",
+    "expected_output": "Refunds are issued within 5 to 10 business days after approval.",
+    "context": [
+      "Refunds are issued to the original payment method within 5 to 10 business days after approval."
+    ]
+  },
+  {
+    "input": "Can I use a promo code and then get a refund if I return the item?",
+    "expected_output": "Yes, but only one promo code can be used per order.",
+    "context": [
+      "Only one promo code can be used per order.",
+      "Refunds are issued to the original payment method within 5 to 10 business days after approval."
+    ]
+  },
+  {
+    "input": "What information do I need to provide to make a warranty claim for a defective electronic item?",
+    "expected_output": "You need proof of purchase.",
+    "context": [
+      "Warranty claims require proof of purchase.",
+      "Electronics include a 1-year limited warranty."
+    ]
+  },
+  {
+    "input": "Can I return a defective item after 60 days for a refund?",
+    "expected_output": "No, refunds are not available after 30 days for opened items, but some orders may qualify for store credit.",
+    "context": [
+      "Opened items may be returned within 30 days of delivery.",
+      "After 30 days, opened items are not eligible for a refund, but some orders may qualify for store credit."
+    ]
+  },
+  {
+    "input": "What shipping method should I use if I want my order to arrive quickly and I don't have a PO box?",
+    "expected_output": "Expedited shipping takes 1 to 2 business days.",
+    "context": [
+      "Expedited shipping takes 1 to 2 business days.",
+      "PO boxes cannot receive expedited shipments."
+    ]
+  },
+  {
+    "input": "What shipping method should I use for quick delivery to a non-PO box address?",
+    "expected_output": "Expedited shipping",
+    "context": [
+      "Expedited shipping takes 1 to 2 business days",
+      "PO boxes cannot receive expedited shipments"
+    ]
+  },
+  {
+    "input": "What information do I need to provide for a damaged delivery claim?",
+    "expected_output": "Order number and a photo of the package label",
+    "context": [
+      "Damaged delivery claims must be submitted within 48 hours of delivery",
+      "Missing item claims must include the order number and a photo of the package label"
+    ]
+  },
+  {
+    "input": "What shipping method should I use for a PO box?",
+    "expected_output": "Standard shipping",
+    "context": [
+      "PO boxes cannot receive expedited shipments",
+      "Standard shipping takes 3 to 5 business days"
+    ]
+  },
+  {
+    "input": "How long does warranty repair take?",
+    "expected_output": "7 to 14 business days",
+    "context": [
+      "Repair turnaround is usually 7 to 14 business days after the item is received"
+    ]
+  },
+  {
+    "input": "When can I expect a response from email support?",
+    "expected_output": "Within 1 to 2 business days",
+    "context": [
+      "Email support replies within 1 to 2 business days"
+    ]
+  },
+  {
+    "input": "Can I get a refund for an unopened item after 60 days?",
+    "expected_output": "No",
+    "context": [
+      "Unopened items may be returned within 60 days of delivery."
+    ]
+  },
+  {
+    "input": "What shipping method should I use for a non-PO box address if I want my order quickly?",
+    "expected_output": "Expedited shipping",
+    "context": [
+      "Expedited shipping takes 1 to 2 business days.",
+      "PO boxes cannot receive expedited shipments."
+    ]
+  },
+  {
+    "input": "What is the time frame for submitting a damaged delivery claim?",
+    "expected_output": "Within 48 hours of delivery",
+    "context": [
+      "Damaged delivery claims must be submitted within 48 hours of delivery"
+    ]
+  },
+  {
+    "input": "How long does it take for a warranty repair to be completed after the item is received?",
+    "expected_output": "7 to 14 business days",
+    "context": [
+      "Repair turnaround is usually 7 to 14 business days after the item is received"
+    ]
+  },
+  {
+    "input": "What is the availability of live chat support?",
+    "expected_output": "Daily from 8:00 AM to 8:00 PM UTC",
+    "context": [
+      "Live chat is available daily from 8:00 AM to 8:00 PM UTC"
+    ]
+  },
+  {
+    "input": "Can I use a gift card to purchase a subscription?",
+    "expected_output": "No",
+    "context": [
+      "Gift cards cannot be combined with subscription purchases"
+    ]
+  },
+  {
+    "input": "Can I return an unopened item after 45 days for a refund?",
+    "expected_output": "Yes, within 60 days",
+    "context": [
+      "Unopened items may be returned within 60 days of delivery"
+    ]
+  },
+  {
+    "input": "What shipping method should I use for quick delivery to a PO box address?",
+    "expected_output": "Standard shipping",
+    "context": [
+      "PO boxes cannot receive expedited shipments",
+      "Standard shipping takes 3 to 5 business days"
+    ]
+  },
+  {
+    "input": "How long does it take to get a response from live chat support?",
+    "expected_output": "Immediately, during support hours",
+    "context": [
+      "Live chat is available daily from 8:00 AM to 8:00 PM UTC"
+    ]
+  },
+  {
+    "input": "What information do I need to provide for a missing item claim?",
+    "expected_output": "Order number and a photo of the package label",
+    "context": [
+      "Missing item claims must include the order number and a photo of the package label"
+    ]
+  },
+  {
+    "input": "Can I return an item after 45 days if it's still unopened?",
+    "expected_output": "Yes, unopened items can be returned within 60 days of delivery.",
+    "context": [
+      "Unopened items may be returned within 60 days of delivery."
+    ]
+  },
+  {
+    "input": "What are the live chat support hours?",
+    "expected_output": "Live chat is available daily from 8:00 AM to 8:00 PM UTC.",
+    "context": [
+      "Live chat is available daily from 8:00 AM to 8:00 PM UTC."
+    ]
+  },
+  {
+    "input": "What shipping method should I use for a non-PO box address if I want my order quickly and it's after 2:00 PM?",
+    "expected_output": "Expedited shipping, but note that orders placed after 2:00 PM local time ship the next business day.",
+    "context": [
+      "Expedited shipping takes 1 to 2 business days.",
+      "Orders placed after 2:00 PM local time ship the next business day."
+    ]
+  },
+  {
+    "input": "How do I cancel my order?",
+    "expected_output": "Cancellations are only possible before the order is packed for shipping.",
+    "context": [
+      "Cancellations are only possible before the order is packed for shipping."
+    ]
+  },
+  {
+    "input": "What information do I need to provide to update my email address?",
+    "expected_output": "You can update your email address from the account settings page, no additional information is needed.",
+    "context": [
+      "Customers can update their email address from the account settings page."
+    ]
+  },
+  {
+    "input": "When can I expect a response from email support if I sent my query on a Friday?",
+    "expected_output": "Within 1 to 2 business days, so likely on Monday or Tuesday.",
+    "context": [
+      "Email support replies within 1 to 2 business days."
+    ]
+  },
+  {
+    "input": "Can I return an opened item after 20 days for a refund?",
+    "expected_output": "Yes, opened items can be returned within 30 days of delivery.",
+    "context": [
+      "Opened items may be returned within 30 days of delivery."
+    ]
+  },
+  {
+    "input": "What shipping method should I use for a non-PO box address if I want my order quickly and it's before 2:00 PM?",
+    "expected_output": "Expedited shipping takes 1 to 2 business days.",
+    "context": [
+      "Expedited shipping takes 1 to 2 business days.",
+      "Orders placed after 2:00 PM local time ship the next business day."
+    ]
+  },
+  {
+    "input": "How do I update my email address in my account?",
+    "expected_output": "Update your email address from the account settings page.",
+    "context": [
+      "Customers can update their email address from the account settings page."
+    ]
+  },
+  {
+    "input": "Can I use a promo code and a gift card for the same order?",
+    "expected_output": "No, only one promo code can be used per order and gift cards cannot be combined with other purchases.",
+    "context": [
+      "Only one promo code can be used per order.",
+      "Gift cards cannot be combined with subscription purchases."
+    ]
   }
 ]

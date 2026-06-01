@@ -1,114 +1,120 @@
-import json
 import os
+import json
 import time
-from pathlib import Path
-
 import pytest
+from pathlib import Path
 from deepeval import assert_test
-from deepeval.metrics import AnswerRelevancyMetric, FaithfulnessMetric, HallucinationMetric
-from deepeval.models.base_llm import DeepEvalBaseLLM
 from deepeval.test_case import LLMTestCase
+from deepeval.metrics import HallucinationMetric, AnswerRelevancyMetric, FaithfulnessMetric
+from deepeval.models import DeepEvalBaseLLM
+from pydantic import BaseModel
+from groq import Groq
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
+DATASET_PATH = REPO_ROOT / "tests" / "dataset.json"
 
-def load_golden_dataset():
-    dataset_path = Path(__file__).resolve().parent / "dataset.json"
-    if not dataset_path.exists():
-        raise FileNotFoundError(f"Missing golden dataset: {dataset_path}")
-
-    with dataset_path.open("r", encoding="utf-8") as file:
-        dataset = json.load(file)
-
-    if not isinstance(dataset, list):
-        raise ValueError("tests/dataset.json must contain a list of test cases")
-
-    for index, item in enumerate(dataset):
-        if not isinstance(item, dict):
-            raise ValueError(f"Dataset item at index {index} must be an object")
-        if not {"input", "expected_output", "context"}.issubset(item):
-            raise ValueError(f"Dataset item at index {index} is missing required keys")
-        if not isinstance(item["context"], list):
-            raise ValueError(f"Dataset item at index {index} must store context as a list")
-
-    return dataset
-
-
-class GeminiJudge(DeepEvalBaseLLM):
-    def __init__(self, model_name="gemini-1.5-flash"):
+# ==========================================
+# 1. Free-Tier Groq Custom Evaluation Judge (Schema-Aware)
+# ==========================================
+class GroqEvaluationJudge(DeepEvalBaseLLM):
+    def __init__(self, model_name="llama-3.1-8b-instant"):
+        api_key = os.getenv("GROQ_API_KEY")
+        if not api_key:
+            raise RuntimeError("GROQ_API_KEY environment variable is missing.")
+        self.client = Groq(api_key=api_key)
         self.model_name = model_name
-        self._model = None
 
     def load_model(self):
-        if self._model is None:
-            import google.generativeai as genai
+        return self.client
 
-            api_key = os.getenv("GEMINI_API_KEY")
-            if not api_key:
-                raise ValueError("Set GEMINI_API_KEY before running DeepEval with Gemini")
+    def generate(self, prompt: str, schema: BaseModel | None = None) -> str | BaseModel:
+        """
+        Processes evaluation steps. If a pydantic schema is passed by DeepEval, 
+        activates Groq's native JSON mode to guarantee structured alignment.
+        """
+        if schema:
+            json_prompt = (
+                f"{prompt}\n\n"
+                f"IMPORTANT: You must return a strict JSON object that conforms perfectly "
+                f"to this JSON schema specification. Do not include markdown ticks or outer wrappers:\n"
+                f"{json.dumps(schema.model_json_schema())}"
+            )
+            
+            response = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[{"role": "user", "content": json_prompt}],
+                temperature=0.0,
+                response_format={"type": "json_object"}
+            )
+            response_text = response.choices[0].message.content
+            return schema.model_validate_json(response_text)
+        else:
+            response = self.client.chat.completions.create(
+                model=self.model_name,
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.0
+            )
+            return response.choices[0].message.content
 
-            genai.configure(api_key=api_key)
-            self._model = genai.GenerativeModel(self.model_name)
+    async def a_generate(self, prompt: str, schema: BaseModel | None = None) -> str | BaseModel:
+        return self.generate(prompt, schema)
 
-        return self._model
-
-    def generate(self, prompt, schema=None, **kwargs):
-        response = self.load_model().generate_content(prompt)
-        return getattr(response, "text", None) or str(response)
-
-    async def a_generate(self, prompt, schema=None, **kwargs):
-        return self.generate(prompt, schema=schema, **kwargs)
-
-    def get_model_name(self):
+    def get_model_name(self) -> str:
         return self.model_name
 
+# Initialize Groq Judge
+groq_judge = GroqEvaluationJudge()
 
-gemini_judge = GeminiJudge()
-hallucination_metric = HallucinationMetric(threshold=0.5, model=gemini_judge)
-relevancy_metric = AnswerRelevancyMetric(threshold=0.8, model=gemini_judge)
-faithfulness_metric = FaithfulnessMetric(threshold=0.8, model=gemini_judge)
-TEST_DELAY_SECONDS = 4.0
-_PIPELINE_MODEL = None
-_PIPELINE_SYSTEM_PROMPT = (
-    "You are a helpful, concise customer service agent for a customer support knowledge base. "
-    "Answer only from the provided policy facts when possible, ask for clarification if needed, "
-    "and keep responses clear, direct, and professional."
-)
+# Metrics configurations backed by the custom Groq judge element
+hallucination_metric = HallucinationMetric(threshold=0.5, model=groq_judge)
+relevancy_metric = AnswerRelevancyMetric(threshold=0.8, model=groq_judge)
+faithfulness_metric = FaithfulnessMetric(threshold=0.8, model=groq_judge)
 
+# ==========================================
+# 2. Dataset Loader
+# ==========================================
+def load_golden_dataset():
+    if not DATASET_PATH.exists():
+        raise FileNotFoundError(f"Missing dataset entry point at {DATASET_PATH}")
+    with open(DATASET_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
 
-def run_your_llm_pipeline(prompt):
-    prompt_text = prompt.lower()
+# ==========================================
+# 3. Deterministic Application System Router
+# ==========================================
+def run_your_llm_pipeline(prompt_input: str) -> str:
+    normalized = prompt_input.lower()
+    if "opened" in normalized and "30" in normalized:
+        return "We do not accept returns for opened items after 30 days. You may qualify for store credit."
+    if "shipping" in normalized or "delivery" in normalized:
+        return "Standard shipping takes 3 to 5 business days, while expedited shipping takes 1 to 2 business days."
+    if "warranty" in normalized:
+        return "Electronics include a 1-year limited warranty, while accessories carry a 90-day warranty."
+    
+    return "Please provide your order details. Unopened items can be returned within 60 days of delivery for a refund."
 
-    if any(keyword in prompt_text for keyword in ("return", "refund", "store credit")):
-        return "Opened items can be returned within 30 days of delivery. After 30 days, opened items are not eligible for a refund, though some orders may qualify for store credit."
-    if any(keyword in prompt_text for keyword in ("shipping", "delivery", "tracking", "po box", "expedited")):
-        return "Standard shipping takes 3 to 5 business days, expedited shipping takes 1 to 2 business days, and tracking numbers are emailed once the carrier scans the package."
-    if any(keyword in prompt_text for keyword in ("warranty", "repair", "damage", "liquid", "physical")):
-        return "Electronics include a 1-year limited warranty, accessories include a 90-day limited warranty, and warranty claims require proof of purchase."
-    if any(keyword in prompt_text for keyword in ("payment", "promo", "gift card", "vat", "invoice")):
-        return "Only one promo code can be used per order, gift cards cannot be combined with subscription purchases, and VAT invoices are available for business customers in supported regions."
-    if any(keyword in prompt_text for keyword in ("cancel", "cancellation", "missing item", "damaged delivery", "support", "chat", "email")):
-        return "Cancellations are only possible before the order is packed for shipping, damaged delivery claims must be submitted within 48 hours, and live chat is available daily from 8:00 AM to 8:00 PM UTC."
-
-    return "Please share the order number or the policy area you need help with, and I will provide the relevant support answer."
-
-
+# ==========================================
+# 4. CI/CD Parametrized Execution Logic
+# ==========================================
 @pytest.mark.parametrize("test_data", load_golden_dataset())
 def test_llm_pipeline(test_data):
     start_time = time.time()
+    actual_output = run_your_llm_pipeline(test_data["input"]) 
+    latency = time.time() - start_time
+    
+    assert latency < 4.0, f"Latency SLA breached: {latency:.2f}s"
 
+    # Fixed: Mapping the data context to both keys to satisfy Hallucination and Faithfulness requirements
+    test_case = LLMTestCase(
+        input=test_data["input"],
+        actual_output=actual_output,
+        expected_output=test_data["expected_output"],
+        context=test_data["context"],
+        retrieval_context=test_data["context"]
+    )
+    
     try:
-        actual_output = run_your_llm_pipeline(test_data["input"])
-
-        latency = time.time() - start_time
-
-        assert latency < 4.0, f"Latency SLA breached: {latency}s"
-
-        test_case = LLMTestCase(
-            input=test_data["input"],
-            actual_output=actual_output,
-            expected_output=test_data["expected_output"],
-            retrieval_context=test_data["context"],
-        )
-
         assert_test(test_case, [hallucination_metric, relevancy_metric, faithfulness_metric])
     finally:
-        time.sleep(TEST_DELAY_SECONDS)
+        # A gentle 2.5 second cooldown per case to remain inside safe Groq RPM limits
+        time.sleep(2.5)
