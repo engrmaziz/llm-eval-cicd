@@ -25,5 +25,14 @@
     "p50_latency_sec": 0.0,
     "p95_latency_sec": 0.0,
     "estimated_cost_usd": 0.0
+  },
+  {
+    "commit_sha": "a4da01f",
+    "timestamp": "2026-06-01 12:04:44 UTC",
+    "total_cases": 0,
+    "pass_rate_percent": 0.0,
+    "p50_latency_sec": 0.0,
+    "p95_latency_sec": 0.0,
+    "estimated_cost_usd": 0.0
   }
 ]
