@@ -1,0 +1,7 @@
+[
+  {
+    "input": "What is your return policy for items opened after 30 days?",
+    "expected_output": "We do not accept returns for opened items after 30 days. You may qualify for store credit.",
+    "context": ["Section 4.2: Opened items are eligible for refund within 30 days. Beyond 30 days, only store credit is issued."]
+  }
+]
